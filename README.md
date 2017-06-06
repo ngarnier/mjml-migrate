@@ -10,7 +10,7 @@ Makes a template coded for MJML 3 compatible with MJML 4
 
 ## Usage
 
-`babel-node index.js receipt.mjml output`
+`babel-node index.js input output`
 
 The output can be either a filename or `-s` to ouput the migrated template to `stdout`.
 
