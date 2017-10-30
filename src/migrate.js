@@ -15,7 +15,7 @@ function fixUnits(attribute, value) {
       return addPx(value)
     }
   }
-  return attribute
+  return value
 }
 
 function addPx(value) {
@@ -34,6 +34,39 @@ function cleanAttributes(attributes) {
   return attributes
 }
 
+function migrateSocialSyntax(socialTag) {
+  const listAllNetworks = (tag) => {
+    let attributes = tag.attributes['display'].split(' ')
+    delete(tag.attributes['display'])
+    return attributes
+  }
+
+  const listAttributes = (tag) => {
+    return tag.attributes
+  }
+
+  const attributes = listAttributes(socialTag)
+
+  const networks = listAllNetworks(socialTag)
+  socialTag.children = []
+
+  for (let network in networks) {
+    socialTag.children.push({
+      tagName: `mj-social-${networks[network]}`,
+      attributes: {},
+      content: attributes[`${networks[network]}-content`] ? attributes[`${networks[network]}-content`] : ''
+    })
+
+    for (let attribute in attributes) {
+      if (attribute.match(networks[network])) {
+        socialTag.children[network].attributes[attribute] = socialTag.attributes[attribute]
+        delete(socialTag.attributes[attribute])
+      }
+    }
+  }
+  return socialTag
+}
+
 function isSupportedTag(tag) {
   const length = unavailableTags.length
   for (let i = 0; i < length; i++) {
@@ -49,6 +82,9 @@ function loopThrough(tree) {
     if (key === 'children') {
       for (let i = 0; i < tree.children.length; i++) {
         if (isSupportedTag(tree.children[i].tagName)) {
+          if (tree.children[i].tagName === 'mj-social') {
+            tree.children[i] = migrateSocialSyntax(tree.children[i])
+          }
           tree.children[i].attributes = cleanAttributes(tree.children[i].attributes)
           loopThrough(tree.children[i])
         }

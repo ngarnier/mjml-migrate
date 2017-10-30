@@ -6,8 +6,7 @@ const unavailableTags = [
     'mj-invoice', 
     'mj-list', 
     'mj-location', 
-    'mj-navbar', 
-    'mj-social'
+    'mj-navbar'
   ]
   
 const attributesWithUnit = [
