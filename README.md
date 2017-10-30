@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Makes a template coded for MJML 3 compatible with MJML 4
+Makes a template following the MJML 3 syntax compatible with MJML 4.
 
 ## Installation
 
@@ -10,12 +10,11 @@ Makes a template coded for MJML 3 compatible with MJML 4
 
 ## Usage
 
-`babel-node index.js input output`
-
-The output can be either a filename or `-s` to ouput the migrated template to `stdout`.
+`migrate <input> <output>`
 
 ## What happens
 
 * `mj-container` is removed and its attributes are passed to `mj-body`
 * Unitless values are converted to `px`
-* Unsupported tags (defined in `unavailableTags`) are removed 
+* `mj-social`'s syntax is replaced with the v4 syntax
+* Unsupported tags (defined in `unavailableTags` in `config.js`) are removed 
