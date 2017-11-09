@@ -1,6 +1,6 @@
 {
   "name": "mjml-migrate",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A tool to migrate a template from MJML 3 to MJML 4",
   "main": "lib/migrate.js",
   "bin": {

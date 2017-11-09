@@ -3,9 +3,11 @@ import { unavailableTags, attributesWithUnit } from './config'
 import mjml2json from 'mjml2json'
 import json2mjml from 'json2mjml'
 
-function removeContainerTag(mjmlJson) {
-  mjmlJson.children[0].attributes = mjmlJson.children[0].children[0].attributes
-  mjmlJson.children[0].children = mjmlJson.children[0].children[0].children
+function removeContainerTag(bodyTag) {
+  bodyTag.attributes = bodyTag.children[0].attributes
+  bodyTag.children = bodyTag.children[0].children
+  
+  return bodyTag
 }
 
 function fixUnits(attribute, value) {
@@ -50,20 +52,29 @@ function migrateSocialSyntax(socialTag) {
   const networks = listAllNetworks(socialTag)
   socialTag.children = []
 
+  // migrate all attributes to their child attributes
   for (let network in networks) {
     socialTag.children.push({
-      tagName: `mj-social-${networks[network]}`,
-      attributes: {},
+      tagName: `mj-social-element`,
+      attributes: {"name": networks[network]},
       content: attributes[`${networks[network]}-content`] ? attributes[`${networks[network]}-content`] : ''
     })
 
     for (let attribute in attributes) {
-      if (attribute.match(networks[network])) {
-        socialTag.children[network].attributes[attribute] = socialTag.attributes[attribute]
+      if (attribute.match(networks[network]) && !attribute.match('content')) {
+        socialTag.children[network].attributes[attribute.replace(`${networks[network]}-`,'')] = socialTag.attributes[attribute]
         delete(socialTag.attributes[attribute])
       }
     }
   }
+
+  // delete all content attributes from the root tag after they've been migrated
+  for (let attribute in attributes) {
+    if (attribute.match('content')) {
+      delete(attributes[attribute])
+    }
+  }
+
   return socialTag
 }
 
@@ -82,6 +93,9 @@ function loopThrough(tree) {
     if (key === 'children') {
       for (let i = 0; i < tree.children.length; i++) {
         if (isSupportedTag(tree.children[i].tagName)) {
+          if (tree.children[i].tagName === 'mj-body') {
+            tree.children[i] = removeContainerTag(tree.children[i])
+          }
           if (tree.children[i].tagName === 'mj-social') {
             tree.children[i] = migrateSocialSyntax(tree.children[i])
           }
@@ -98,7 +112,6 @@ function loopThrough(tree) {
 
 export default function migrate(input) {
   const mjmlJson = mjml2json(input)
-  removeContainerTag(mjmlJson)
   loopThrough(mjmlJson)
   
   return json2mjml(mjmlJson)
