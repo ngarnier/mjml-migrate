@@ -2,7 +2,6 @@ const unavailableTags = [
     'mj-accordion', 
     'mj-carousel', 
     'mj-html', 
-    'mj-hero', 
     'mj-invoice', 
     'mj-list', 
     'mj-location', 

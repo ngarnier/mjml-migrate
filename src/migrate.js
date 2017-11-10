@@ -10,6 +10,10 @@ function removeContainerTag(bodyTag) {
   return bodyTag
 }
 
+const listAttributes = (tag) => {
+  return tag.attributes
+}
+
 function fixUnits(attribute, value) {
   let length = attributesWithUnit.length
   for (let i = 0; i < length; i++) {
@@ -43,11 +47,8 @@ function migrateSocialSyntax(socialTag) {
     return attributes
   }
 
-  const listAttributes = (tag) => {
-    return tag.attributes
-  }
-
   const attributes = listAttributes(socialTag)
+  delete(attributes['display'])
 
   const networks = listAllNetworks(socialTag)
   socialTag.children = []
@@ -78,6 +79,18 @@ function migrateSocialSyntax(socialTag) {
   return socialTag
 }
 
+function migrateHeroSyntax(heroTag) {
+  const contentAttributes = listAttributes(heroTag.children[0])
+
+  for (let attribute in contentAttributes) {
+    console.log(attribute)
+    heroTag.attributes[attribute] = heroTag.children[0].attributes[attribute]
+  }
+
+  heroTag.children = heroTag.children[0].children
+  return heroTag
+}
+
 function isSupportedTag(tag) {
   const length = unavailableTags.length
   for (let i = 0; i < length; i++) {
@@ -96,8 +109,11 @@ function loopThrough(tree) {
           if (tree.children[i].tagName === 'mj-body') {
             tree.children[i] = removeContainerTag(tree.children[i])
           }
-          if (tree.children[i].tagName === 'mj-social') {
+          else if (tree.children[i].tagName === 'mj-social') {
             tree.children[i] = migrateSocialSyntax(tree.children[i])
+          }
+          else if (tree.children[i].tagName === 'mj-hero') {
+            tree.children[i] = migrateHeroSyntax(tree.children[i])
           }
           tree.children[i].attributes = cleanAttributes(tree.children[i].attributes)
           loopThrough(tree.children[i])
