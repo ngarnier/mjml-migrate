@@ -6,7 +6,7 @@ Makes a template following the MJML 3 syntax compatible with MJML 4.
 
 ## Installation
 
-`npm install`
+Clone the repo & `npm install` or install via NPM: `npm install mjml-migrate`
 
 ## Usage
 
